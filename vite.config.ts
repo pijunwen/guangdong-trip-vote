@@ -13,6 +13,7 @@ export default defineConfig({
         main: path.resolve(__dirname, "index.html"),
         pc: path.resolve(__dirname, "pc/index.html"),
         app: path.resolve(__dirname, "app/index.html"),
+        meiziping: path.resolve(__dirname, "app/meiziping.html"),
       },
     },
   },

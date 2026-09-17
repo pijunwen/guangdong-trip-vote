@@ -10,6 +10,7 @@ type TripRoute = {
   bestFor: string;
   highlights: string[];
   note: string;
+  detailHref?: string;
 };
 
 type AvailableDate = {
@@ -40,7 +41,8 @@ const routes: TripRoute[] = [
     transit: "广州自驾约2.5-3小时",
     bestFor: "想看喀斯特石林、能接受连续徒步的朋友",
     highlights: ["喀斯特石林", "青石古道", "古村梯田", "山野徒步"],
-    note: "常见环线约8-10公里、耗时4-6小时；雨天青石板湿滑，需穿防滑徒步鞋",
+    note: "常见环线约8-9公里、整体预留5-6小时；雨天青石板湿滑，需穿防滑徒步鞋",
+    detailHref: "./meiziping.html",
   },
   {
     id: "shaoguan-danxia",
@@ -189,34 +191,44 @@ function App() {
           {routes.map((route) => {
             const selected = selectedIds.includes(route.id);
             return (
-              <button
+              <article
                 className={`route-card${selected ? " route-card--selected" : ""}`}
-                type="button"
                 key={route.id}
-                aria-pressed={selected}
-                onClick={() => toggleSelection(route.id, setSelectedIds)}
               >
-                <span className="route-card__select" aria-hidden="true">
-                  {selected ? "✓" : route.code}
-                </span>
-                <span className="route-card__content">
-                  <span className="route-card__heading">
-                    <span className="route-card__name">{route.name}</span>
+                <button
+                  className="route-card__toggle"
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => toggleSelection(route.id, setSelectedIds)}
+                >
+                  <span className="route-card__select" aria-hidden="true">
+                    {selected ? "✓" : route.code}
                   </span>
-                  <span className="route-card__tagline">{route.tagline}</span>
-                  <span className="route-card__facts">
-                    <span>{route.duration}</span>
-                    <span>{route.transit}</span>
+                  <span className="route-card__content">
+                    <span className="route-card__heading">
+                      <span className="route-card__name">{route.name}</span>
+                    </span>
+                    <span className="route-card__tagline">{route.tagline}</span>
+                    <span className="route-card__facts">
+                      <span>{route.duration}</span>
+                      <span>{route.transit}</span>
+                    </span>
+                    <span className="route-card__fit">适合：{route.bestFor}</span>
+                    <span className="route-card__highlights">
+                      {route.highlights.map((highlight) => (
+                        <span className="route-chip" key={highlight}>{highlight}</span>
+                      ))}
+                    </span>
+                    <span className="route-card__note">注意：{route.note}</span>
                   </span>
-                  <span className="route-card__fit">适合：{route.bestFor}</span>
-                  <span className="route-card__highlights">
-                    {route.highlights.map((highlight) => (
-                      <span className="route-chip" key={highlight}>{highlight}</span>
-                    ))}
-                  </span>
-                  <span className="route-card__note">注意：{route.note}</span>
-                </span>
-              </button>
+                </button>
+                {route.detailHref && (
+                  <a className="route-card__detail" href={route.detailHref}>
+                    查看详细行程
+                    <span aria-hidden="true">›</span>
+                  </a>
+                )}
+              </article>
             );
           })}
         </section>
