@@ -1,0 +1,90 @@
+/*
+ * 文件定位：运行时设计变量。
+ *
+ * 本文件提供 PC/APP 生成页实际可生效的 CSS 变量值。
+ * 变量怎么用、什么时候用，见 resources/design/shared/design-tokens.md。
+ *
+ * 本文件被 design-tokens.md、pc.css、app.css、pc-page-frame.md、
+ * shared/page-patterns/、app/component-styles.md 等规范和模板引用。
+ * 若 token 名称、值或语义用途变化，必须同步检查这些引用方。
+ */
+
+:root {
+  /* 基础展示类 */
+  --color-card-bg: #ffffff;
+  --color-page-bg: #f3f4f5;
+  --color-section-bg: #f7f7f7;
+  --color-text-primary: #333333;
+  --color-text-secondary: #999999;
+  --color-text-disabled: #cccccc;
+  --color-border: #e0e0e0;
+  --color-track-bg: #0000000d;
+  --color-mask-bg: #000000b3;
+
+  /* 操作反馈 */
+  --color-action-primary: #155bd4;
+  --color-action-primary-hover: #3570d4;
+  --color-action-primary-active: #114bad;
+  --color-secondary-action-bg: #0000000f;
+  --color-secondary-action-bg-hover: #00000008;
+  --color-secondary-action-bg-active: #00000017;
+  --color-icon-button-bg: #ffffff1a;
+  --color-icon-button-bg-hover: #0000000d;
+  --color-icon-button-bg-active: #0000001a;
+  --color-link: #155bd4;
+  --color-link-hover: #3570d4;
+  --color-link-active: #114bad;
+
+  /* 语义色 */
+  --color-success: #45a110;
+  --color-success-bg: #efffe6;
+  --color-danger: #d42f15;
+  --color-danger-bg: #ffe9e6;
+  --color-warning: #ed6a18;
+  --color-warning-bg: #ffefe6;
+  --color-rating: #edd418;
+  --color-youzan-logo: #e00000;
+
+  /* 字体尺寸 */
+  --font-size-hero-title: 34px;
+  --line-height-hero-title: 44px;
+  --font-size-page-title: 24px;
+  --line-height-page-title: 30px;
+  --font-size-section-title: 20px;
+  --line-height-section-title: 26px;
+  --font-size-subsection-title: 16px;
+  --line-height-subsection-title: 24px;
+  --font-size-body: 14px;
+  --line-height-body: 20px;
+  --font-size-caption: 12px;
+  --line-height-caption: 18px;
+  --font-size-badge: 10px;
+  --line-height-badge: 16px;
+
+  /* 通用字重 */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+
+  /* 字体族 */
+  --font-family-base: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+  --font-family-number: Avenir, "Avenir Next", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+
+  /* 圆角 */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-lg: 12px;
+
+  /* 间距 */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-base: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-xxl: 56px;
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.10);
+  --shadow-md: 0 2px 16px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 2px 24px rgba(0, 0, 0, 0.10);
+}

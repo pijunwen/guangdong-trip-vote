@@ -1,0 +1,520 @@
+/*
+ * APP 端生成页基础样式。
+ *
+ * 文档定位：
+ * - 本文件是 APP 端基础通用样式，用于生成页面时快捷调用，避免重复编写基础布局。
+ * - 本文件不是设计规范，不维护独立的颜色、字体、间距、圆角体系。
+ * - 基础变量由 tokens.css 提供；变量语义和使用规则见 resources/design/shared/design-tokens.md。
+ *
+ * 注意事项：
+ * - 禁止加入具体业务样式、非通用样式。
+ * - 样式值优先复用 tokens.css、Zan Design token 或 component-styles.md 中已有定义；仅当设计源未覆盖且业务/模板确有通用诉求时，才允许补充样式。
+ * - 若本文件与 Zan Design 冲突，以 Zan Design 为准，并同步修正本文件。
+ *
+ * 当前允许的补充项：
+ * - APP 预览画布：375px × 812px。
+ * - 吸底区域高度：不固定高度，用内容自然撑开。
+ * - 页面底部操作留白：90px + 吸底区域。
+ * - APP 页面基础内边距：12px。
+ * - APP 页面模块间距：12px。
+ * - APP 二级 Tab：胶囊样式，高度 28px。
+ * - APP 页面内小按钮：66px × 30px；吸底中按钮：80px × 44px。
+ * - APP 导航栏内容高度：54px。
+ * - APP 顶部导航默认只展示左侧返回与居中标题，右侧区域默认不渲染任何元素。
+ * - APP 一级 Tab 选中下划线贴齐 Tab 容器底部，二者之间不留视觉间距。
+ * - APP 通用线宽：0.5px。
+ */
+
+/* APP 补充变量 */
+:root {
+  --app-preview-width: 375px;
+  --app-preview-height: 812px;
+  --app-page-padding: var(--space-md);
+  --app-nav-height: 54px;
+  --app-tab-height: 28px;
+  --app-button-height: 30px;
+  --app-button-min-width: 66px;
+  --app-button-min-height: 44px;
+  --app-bottom-button-width: 80px;
+  --app-bottom-button-height: 44px;
+  --app-bottom-operation-space: 90px;
+  --app-line-width: 0.5px;
+  --app-color-brand-light: rgba(21, 91, 212, 0.09);
+  --app-color-primary-disabled-bg: #e6efff;
+
+  /*
+   * 默认按“一个 44px 按钮 + 上下 8px padding”的吸底区预留空间。
+   * 如果某个页面的吸底区内容更高，应在页面级 class 上覆盖该变量。
+   */
+  --app-bottom-bar-height: calc(
+    var(--app-button-min-height) + var(--space-sm) + var(--space-sm)
+  );
+}
+
+/* 全局基础 */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: var(--space-lg) 0;
+  background: var(--color-page-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-family-base);
+}
+
+button {
+  font: inherit;
+}
+
+/* 页面结构 */
+.app-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--app-preview-width);
+  height: var(--app-preview-height);
+  min-height: var(--app-preview-height);
+  overflow-y: auto;
+  background: var(--color-section-bg);
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: var(--shadow-lg);
+}
+
+.app-page {
+  flex: 1 0 auto;
+  min-height: 0;
+  padding: var(--app-page-padding);
+  padding-bottom: calc(var(--app-bottom-operation-space) + env(safe-area-inset-bottom));
+}
+
+.app-page > * + *,
+.app-page__content > * + *,
+.app-tab-panel > * + * {
+  margin-top: var(--space-md);
+}
+
+.app-page--with-bottom-bar {
+  padding-bottom: calc(
+    var(--app-bottom-operation-space) + var(--app-bottom-bar-height) + env(safe-area-inset-bottom)
+  );
+}
+
+/* 顶部导航 */
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(var(--app-nav-height) + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) var(--space-md) 0;
+  background: var(--color-card-bg);
+}
+
+.app-nav__title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-subsection-title);
+  line-height: var(--line-height-subsection-title);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+}
+
+.app-nav__left,
+.app-nav__right {
+  position: absolute;
+  bottom: 0;
+  min-height: var(--app-nav-height);
+  display: flex;
+  align-items: center;
+}
+
+.app-nav__left {
+  left: var(--space-md);
+}
+
+.app-nav__right {
+  right: var(--space-md);
+}
+
+.app-nav__icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  min-height: var(--app-nav-height);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.app-nav__back-icon {
+  width: 10px;
+  height: 10px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* 一级 Tab */
+.app-primary-tabs {
+  display: flex;
+  min-height: var(--app-button-min-height);
+  background: var(--color-card-bg);
+  border-bottom: var(--app-line-width) solid var(--color-border);
+}
+
+.app-primary-tab {
+  flex: 1 1 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--app-button-min-height);
+  padding: var(--space-sm) var(--space-md);
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-subsection-title);
+  line-height: var(--line-height-subsection-title);
+  font-weight: var(--font-weight-regular);
+  text-align: center;
+  cursor: pointer;
+}
+
+.app-primary-tab:active {
+  background: var(--color-secondary-action-bg-hover);
+}
+
+.app-primary-tab--active {
+  color: var(--color-text-primary);
+}
+
+.app-primary-tab__text {
+  display: inline-block;
+}
+
+.app-primary-tab--active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 32px;
+  height: var(--radius-xs);
+  transform: translateX(-50%);
+  background: var(--color-action-primary);
+  border-radius: var(--radius-xs);
+}
+
+/* 二级 Tab */
+.app-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-left: var(--space-xs);
+}
+
+.app-tab {
+  flex: 0 0 auto;
+  min-height: var(--app-tab-height);
+  padding: var(--space-xs) var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-track-bg);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  text-align: center;
+  cursor: pointer;
+}
+
+.app-tab:active {
+  background: var(--color-secondary-action-bg-hover);
+}
+
+.app-tab--active {
+  background: var(--app-color-brand-light);
+  color: var(--color-action-primary);
+  font-weight: var(--font-weight-regular);
+}
+
+/* 卡片与区块 */
+.app-card {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--space-base) var(--space-base) var(--space-md);
+}
+
+.app-card > * + * {
+  margin-top: var(--space-md);
+}
+
+.app-card + .app-card {
+  margin-top: var(--space-md);
+}
+
+.app-grid > .app-card + .app-card {
+  margin-top: 0;
+}
+
+.app-section-bg {
+  background: var(--color-section-bg);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+}
+
+.app-divider {
+  height: var(--app-line-width);
+  background: var(--color-border);
+  border: 0;
+  margin: var(--space-base) 0 var(--space-md);
+}
+
+.app-card > .app-body + .app-caption {
+  margin-top: var(--space-xs);
+}
+
+/* 文本样式 */
+.app-title {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-subsection-title);
+  line-height: var(--line-height-subsection-title);
+  font-weight: var(--font-weight-medium);
+}
+
+.app-body {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: var(--font-weight-regular);
+}
+
+.app-caption {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-weight: var(--font-weight-regular);
+}
+
+/* 按钮 */
+.app-text-link {
+  min-height: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-link);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  cursor: pointer;
+}
+
+.app-nav .app-text-link {
+  min-height: var(--app-nav-height);
+  padding: var(--space-sm);
+}
+
+.app-text-link:active {
+  color: var(--color-link-active);
+  background: var(--color-secondary-action-bg-active);
+}
+
+.app-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--app-button-height);
+  min-width: var(--app-button-min-width);
+  padding: var(--space-xs) var(--space-md);
+  border: 0;
+  border-radius: var(--radius-xs);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: var(--font-weight-regular);
+  cursor: pointer;
+  transition: background 200ms cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.app-button:disabled {
+  cursor: not-allowed;
+}
+
+.app-button--primary {
+  border: 0;
+  background: var(--color-action-primary);
+  color: var(--color-card-bg);
+}
+
+.app-button--primary:active {
+  background: var(--color-action-primary-active);
+}
+
+.app-button--primary:disabled {
+  background: var(--app-color-primary-disabled-bg);
+  color: var(--color-text-disabled);
+}
+
+.app-button--secondary {
+  border: 0;
+  background: var(--color-secondary-action-bg);
+  color: var(--color-text-primary);
+}
+
+.app-button--secondary:active {
+  border-color: var(--color-action-primary-active);
+  color: var(--color-action-primary-active);
+  background: var(--color-secondary-action-bg-active);
+}
+
+.app-button--secondary:disabled {
+  border-color: var(--color-border);
+  color: var(--color-text-disabled);
+  background: var(--color-section-bg);
+}
+
+.app-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}
+
+/* 吸底操作区 */
+.app-bottom-bar {
+  position: sticky;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md) calc(var(--space-sm) + env(safe-area-inset-bottom));
+  background: var(--color-card-bg);
+  border-top: var(--app-line-width) solid var(--color-border);
+}
+
+.app-bottom-bar .app-button {
+  flex: 0 0 var(--app-bottom-button-width);
+  min-height: var(--app-bottom-button-height);
+  min-width: var(--app-bottom-button-width);
+  font-size: var(--font-size-subsection-title);
+  line-height: var(--line-height-subsection-title);
+}
+
+/* 栅格 */
+.app-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.app-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* 列表&表单 */
+.app-list,
+.app-form {
+  background: var(--color-card-bg);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.app-list-item,
+.app-form-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: calc(var(--app-button-min-height) + var(--space-xs));
+  padding: var(--space-md) var(--space-base);
+  background: var(--color-card-bg);
+}
+
+.app-list-item + .app-list-item,
+.app-form-item + .app-form-item {
+  border-top: 0;
+}
+
+.app-list-item + .app-list-item::before,
+.app-form-item + .app-form-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: var(--space-base);
+  right: 0;
+  height: var(--app-line-width);
+  background: var(--color-border);
+}
+
+.app-list-item__label,
+.app-form-item__label {
+  flex: 0 0 112px;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: var(--font-weight-regular);
+}
+
+.app-list-item__value,
+.app-form-item__value {
+  flex: 1;
+  min-width: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  font-weight: var(--font-weight-regular);
+  text-align: left;
+}
+
+.app-list-item__value--placeholder,
+.app-list-item__value--disabled,
+.app-form-item__value--placeholder,
+.app-form-item__value--disabled {
+  color: var(--color-text-disabled);
+}
+
+.app-list-item__arrow,
+.app-form-item__arrow {
+  flex: 0 0 auto;
+  margin-left: var(--space-sm);
+  color: var(--color-text-disabled);
+}
+
+.app-list-item--clickable,
+.app-form-item--clickable {
+  cursor: pointer;
+}
+
+.app-list-item--clickable:active,
+.app-form-item--clickable:active {
+  background: var(--color-secondary-action-bg-hover);
+}
+
+/* 行布局 */
+.app-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.app-row--between {
+  justify-content: space-between;
+}
