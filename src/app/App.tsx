@@ -10,58 +10,41 @@ type TripRoute = {
   bestFor: string;
   highlights: string[];
   note: string;
-  recommended?: boolean;
+};
+
+type AvailableDate = {
+  id: string;
+  date: string;
+  weekday: string;
+  badge?: string;
 };
 
 const routes: TripRoute[] = [
   {
-    id: "chaoshan",
+    id: "qingyuan-gulong",
     code: "A",
-    name: "潮州＋汕头＋南澳岛",
-    tagline: "美食、人文和海岛一次满足",
-    duration: "3天2晚",
-    transit: "高铁约2-3小时，落地租车或包车",
-    bestFor: "第一次组局、口味难统一的朋友群",
-    highlights: ["潮州古城", "牛肉火锅", "汕头小公园", "南澳岛环岛"],
-    note: "整体最均衡，但南澳岛周末车流较多，建议早出发",
-    recommended: true,
-  },
-  {
-    id: "huizhou",
-    code: "B",
-    name: "惠州双月湾＋盐洲岛",
-    tagline: "包栋、看海、烧烤，组团氛围最好",
-    duration: "2天1晚",
-    transit: "广州自驾约2.5-3.5小时",
-    bestFor: "4人以上、想住在一起玩到晚",
-    highlights: ["海景民宿", "日落海滩", "海鲜晚餐", "别墅聚会"],
-    note: "周末沿海公路容易拥堵，返程尽量避开傍晚高峰",
-  },
-  {
-    id: "zhuhai",
-    code: "C",
-    name: "珠海＋外伶仃岛",
-    tagline: "路程轻松，适合慢节奏海岛周末",
-    duration: "2-3天",
-    transit: "城轨约1-1.5小时，再转轮船",
-    bestFor: "不想长途自驾、偏爱海岛和拍照",
-    highlights: ["海岛徒步", "礁石日落", "海鲜", "珠海夜景"],
-    note: "船班受风浪影响，确定日期后需要复核并提前购票",
-  },
-  {
-    id: "qingyuan",
-    code: "D",
     name: "清远古龙峡＋温泉",
     tagline: "白天玩刺激，晚上泡温泉放松",
     duration: "2天1晚",
     transit: "广州自驾约1.5-2小时",
     bestFor: "喜欢漂流和团队活动的年轻人",
     highlights: ["峡谷漂流", "玻璃峡谷", "温泉", "聚餐"],
-    note: "漂流属于季节项目，开放情况取决于出发日期和天气",
+    note: "9月下旬至10月初的漂流开放情况受天气和景区安排影响，确定日期后需再核实",
   },
   {
-    id: "shaoguan",
-    code: "E",
+    id: "qingyuan-meiziping",
+    code: "B",
+    name: "清远梅子坪古道徒步",
+    tagline: "穿过古道、石林和古村的山野线路",
+    duration: "1天或2天1晚",
+    transit: "广州自驾约2.5-3小时",
+    bestFor: "想看喀斯特石林、能接受连续徒步的朋友",
+    highlights: ["喀斯特石林", "青石古道", "古村梯田", "山野徒步"],
+    note: "常见环线约8-10公里、耗时4-6小时；雨天青石板湿滑，需穿防滑徒步鞋",
+  },
+  {
+    id: "shaoguan-danxia",
+    code: "C",
     name: "韶关丹霞山",
     tagline: "用一场登山换自然风景和日出",
     duration: "2-3天",
@@ -72,22 +55,54 @@ const routes: TripRoute[] = [
   },
 ];
 
-const STORAGE_KEY = "guangdong-trip-vote";
+const availableDates: AvailableDate[] = [
+  { id: "2026-09-25", date: "9月25日", weekday: "周五", badge: "中秋" },
+  { id: "2026-09-26", date: "9月26日", weekday: "周六" },
+  { id: "2026-09-27", date: "9月27日", weekday: "周日" },
+  { id: "2026-09-28", date: "9月28日", weekday: "周一" },
+  { id: "2026-09-29", date: "9月29日", weekday: "周二" },
+  { id: "2026-09-30", date: "9月30日", weekday: "周三" },
+  { id: "2026-10-01", date: "10月1日", weekday: "周四", badge: "国庆" },
+  { id: "2026-10-02", date: "10月2日", weekday: "周五" },
+  { id: "2026-10-03", date: "10月3日", weekday: "周六" },
+  { id: "2026-10-04", date: "10月4日", weekday: "周日" },
+  { id: "2026-10-05", date: "10月5日", weekday: "周一" },
+  { id: "2026-10-06", date: "10月6日", weekday: "周二" },
+  { id: "2026-10-07", date: "10月7日", weekday: "周三" },
+];
+
+const ROUTE_STORAGE_KEY = "guangdong-trip-routes-v2";
+const DATE_STORAGE_KEY = "guangdong-trip-dates-v2";
+
+const readStoredIds = (key: string, validIds: string[]) => {
+  try {
+    const parsed: unknown = JSON.parse(window.localStorage.getItem(key) ?? "[]");
+    return Array.isArray(parsed)
+      ? parsed.filter(
+          (value): value is string => typeof value === "string" && validIds.includes(value)
+        )
+      : [];
+  } catch {
+    return [];
+  }
+};
 
 function App() {
-  const [selectedIds, setSelectedIds] = useState<string[]>(() => {
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [selectedIds, setSelectedIds] = useState<string[]>(() =>
+    readStoredIds(ROUTE_STORAGE_KEY, routes.map((route) => route.id))
+  );
+  const [selectedDateIds, setSelectedDateIds] = useState<string[]>(() =>
+    readStoredIds(DATE_STORAGE_KEY, availableDates.map((date) => date.id))
+  );
   const [toast, setToast] = useState("");
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(selectedIds));
+    window.localStorage.setItem(ROUTE_STORAGE_KEY, JSON.stringify(selectedIds));
   }, [selectedIds]);
+
+  useEffect(() => {
+    window.localStorage.setItem(DATE_STORAGE_KEY, JSON.stringify(selectedDateIds));
+  }, [selectedDateIds]);
 
   useEffect(() => {
     if (!toast) return;
@@ -99,22 +114,44 @@ function App() {
     () => routes.filter((route) => selectedIds.includes(route.id)),
     [selectedIds]
   );
+  const selectedDates = useMemo(
+    () => availableDates.filter((date) => selectedDateIds.includes(date.id)),
+    [selectedDateIds]
+  );
+  const canCopy = selectedRoutes.length > 0 && selectedDates.length > 0;
+  const hasSelection = selectedIds.length > 0 || selectedDateIds.length > 0;
 
-  const toggleRoute = (routeId: string) => {
-    setSelectedIds((current) =>
-      current.includes(routeId)
-        ? current.filter((id) => id !== routeId)
-        : [...current, routeId]
+  const toggleSelection = (
+    value: string,
+    setSelection: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    setSelection((current) =>
+      current.includes(value) ? current.filter((item) => item !== value) : [...current, value]
     );
   };
 
   const copyVote = async () => {
-    if (selectedRoutes.length === 0) return;
-    const result = [
-      "广东省内旅行投票",
+    if (!canCopy) return;
+    const lines = [
+      "清远与韶关旅行投票",
+      "",
+      "想去的路线：",
       ...selectedRoutes.map((route) => `${route.code}. ${route.name}（${route.duration}）`),
-      "我可以接受以上路线，大家继续投票。",
-    ].join("\n");
+      "",
+      "有空的日期：",
+      ...selectedDates.map(
+        (date) => `${date.date} ${date.weekday}${date.badge ? `（${date.badge}）` : ""}`
+      ),
+    ];
+
+    if (
+      selectedIds.includes("qingyuan-gulong") &&
+      selectedIds.includes("qingyuan-meiziping")
+    ) {
+      lines.push("", "两个清远选项都去建议安排3天2晚。");
+    }
+
+    const result = lines.join("\n");
 
     try {
       await navigator.clipboard.writeText(result);
@@ -133,18 +170,18 @@ function App() {
   return (
     <div className="app-shell travel-shell">
       <header className="app-nav">
-        <h1 className="app-nav__title">广东省内旅行投票</h1>
+        <h1 className="app-nav__title">清远与韶关旅行投票</h1>
       </header>
 
       <main className="app-page app-page--with-bottom-bar travel-page">
         <section className="travel-intro" aria-labelledby="travel-title">
           <span className="tag tag--primary">广州出发</span>
-          <h2 id="travel-title">这次去哪玩</h2>
-          <p>都是年轻人，人数和日期暂未确定。先选喜欢的路线，可多选。</p>
+          <h2 id="travel-title">路线和时间一起选</h2>
+          <p>先选想去的路线，再勾选2026年9月25日至10月7日所有有空的日期，均可多选。</p>
         </section>
 
         <div className="travel-summary" aria-live="polite">
-          <span>共 5 条候选路线</span>
+          <span>共 3 条候选路线</span>
           <strong>已选 {selectedIds.length} 条</strong>
         </div>
 
@@ -157,7 +194,7 @@ function App() {
                 type="button"
                 key={route.id}
                 aria-pressed={selected}
-                onClick={() => toggleRoute(route.id)}
+                onClick={() => toggleSelection(route.id, setSelectedIds)}
               >
                 <span className="route-card__select" aria-hidden="true">
                   {selected ? "✓" : route.code}
@@ -165,7 +202,6 @@ function App() {
                 <span className="route-card__content">
                   <span className="route-card__heading">
                     <span className="route-card__name">{route.name}</span>
-                    {route.recommended && <span className="tag tag--success">推荐</span>}
                   </span>
                   <span className="route-card__tagline">{route.tagline}</span>
                   <span className="route-card__facts">
@@ -185,28 +221,62 @@ function App() {
           })}
         </section>
 
+        <section className="app-card availability-card" aria-labelledby="availability-title">
+          <div className="availability-card__header">
+            <div>
+              <h2 className="app-title" id="availability-title">哪些日期有空</h2>
+              <p className="app-caption">2026-09-25 至 2026-10-07，可多选</p>
+            </div>
+            <strong>{selectedDateIds.length} 天</strong>
+          </div>
+          <div className="date-grid">
+            {availableDates.map((date) => {
+              const selected = selectedDateIds.includes(date.id);
+              return (
+                <button
+                  className={`date-option${selected ? " date-option--selected" : ""}`}
+                  type="button"
+                  key={date.id}
+                  aria-pressed={selected}
+                  aria-label={`${date.date} ${date.weekday}${date.badge ? ` ${date.badge}` : ""}`}
+                  onClick={() => toggleSelection(date.id, setSelectedDateIds)}
+                >
+                  <span className="date-option__date">{date.date}</span>
+                  <span className="date-option__meta">
+                    <span>{date.weekday}</span>
+                    {date.badge && <span className="date-option__badge">{date.badge}</span>}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
         <section className="alert alert--info travel-tip">
-          先选目的地。确定日期后，再核对高铁、船班、天气和漂流开放情况。
+          两个清远选项可以一起去，但古龙峡到梅子坪所在的阳山江英镇道路估算约123公里、正常约1小时40分。节假日建议按3天2晚安排；若只有2天1晚，选其一会更轻松。
         </section>
       </main>
 
       <div className="app-bottom-bar travel-bottom-bar">
         <div className="travel-bottom-bar__summary">
-          <span>已选</span>
-          <strong>{selectedIds.length}</strong>
+          <span>路线<strong>{selectedIds.length}</strong></span>
+          <span>日期<strong>{selectedDateIds.length}</strong></span>
         </div>
         <button
           className="app-text-link travel-reset"
           type="button"
-          disabled={selectedIds.length === 0}
-          onClick={() => setSelectedIds([])}
+          disabled={!hasSelection}
+          onClick={() => {
+            setSelectedIds([]);
+            setSelectedDateIds([]);
+          }}
         >
           重新选择
         </button>
         <button
           className="app-button app-button--primary travel-copy"
           type="button"
-          disabled={selectedIds.length === 0}
+          disabled={!canCopy}
           onClick={copyVote}
         >
           复制结果
